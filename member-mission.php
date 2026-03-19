@@ -79,10 +79,19 @@ function member_mission_maybe_reset_monthly( $user_id ) {
 // ============================================================
 // ショートコード
 // ============================================================
-function member_mission_shortcode() {
+function member_mission_shortcode( $atts = [] ) {
     if ( ! is_user_logged_in() ) {
         return '<p>' . esc_html( 'このコンテンツを表示するにはログインが必要です。' ) . '</p>';
     }
+
+    $atts = shortcode_atts(
+        [
+            'check_sound' => '',
+            'clear_sound' => '',
+        ],
+        $atts,
+        'member_mission'
+    );
 
     $user_id = get_current_user_id();
     member_mission_maybe_reset_monthly( $user_id );
@@ -100,7 +109,9 @@ function member_mission_shortcode() {
          data-nonce="<?php echo esc_attr( wp_create_nonce( 'member_mission_nonce' ) ); ?>"
          data-ajaxurl="<?php echo esc_attr( admin_url( 'admin-ajax.php' ) ); ?>"
          data-total="<?php echo esc_attr( $total_stages ); ?>"
-         data-current="<?php echo esc_attr( $current ); ?>">
+         data-current="<?php echo esc_attr( $current ); ?>"
+         data-check-sound="<?php echo esc_attr( esc_url( $atts['check_sound'] ) ); ?>"
+         data-clear-sound="<?php echo esc_attr( esc_url( $atts['clear_sound'] ) ); ?>">
 
         <?php foreach ( $stages as $num => $stage ) :
             $checked_meta = get_user_meta( $user_id, 'member_mission_checked_' . $num, true );
@@ -445,6 +456,25 @@ CSS;
     var current    = parseInt($wrap.data('current'), 10);
     var celebrating = false;
 
+    /* ── audio ───────────────────────────────────────── */
+    var checkSoundUrl = $wrap.data('check-sound') || '';
+    var clearSoundUrl = $wrap.data('clear-sound') || '';
+
+    var checkAudio = checkSoundUrl ? new Audio(checkSoundUrl) : null;
+    var clearAudio = clearSoundUrl ? new Audio(clearSoundUrl) : null;
+
+    if (checkAudio) { checkAudio.preload = 'auto'; }
+    if (clearAudio) { clearAudio.preload = 'auto'; }
+
+    function playSound(audio) {
+        if (!audio) { return; }
+        try {
+            var clone = audio.cloneNode();
+            clone.volume = 0.7;
+            clone.play().catch(function () {});
+        } catch (e) {}
+    }
+
     /* ── helpers ─────────────────────────────────────── */
 
     function stageEl(num) {
@@ -581,12 +611,18 @@ CSS;
 
         $cb.closest('.mmission-item').toggleClass('mmission-done', isNowOn);
 
+        // チェック音
+        if (isNowOn) { playSound(checkAudio); }
+
         refreshFooter(stageNum);
 
-        // DOM更新後に「全完了になったか」を判定 → 紙吹雪
+        // DOM更新後に「全完了になったか」を判定 → 紙吹雪 + クリア音
         var allDone = (checkedInStage(stageNum) === tot);
         if (allDone && !wasAllDone) {
-            setTimeout(celebrate, 120);
+            setTimeout(function () {
+                playSound(clearAudio);
+                celebrate();
+            }, 120);
         }
 
         // persist via AJAX
