@@ -116,10 +116,6 @@ function member_mission_shortcode() {
              data-stage="<?php echo esc_attr( $num ); ?>"
              style="<?php echo $is_visible ? '' : 'display:none;opacity:0;'; ?>">
 
-            <?php if ( $num > 1 ) : ?>
-            <button class="mmission-back-btn" data-stage="<?php echo esc_attr( $num ); ?>" aria-label="前のミッションへ戻る">&#9664; 戻る</button>
-            <?php endif; ?>
-
             <div class="mmission-header">
                 <h3 class="mmission-title"><?php echo esc_html( $stage['label'] ); ?></h3>
                 <span class="mmission-count" data-stage="<?php echo esc_attr( $num ); ?>">
@@ -157,6 +153,9 @@ function member_mission_shortcode() {
             </ul>
 
             <div class="mmission-footer" data-stage="<?php echo esc_attr( $num ); ?>">
+                <?php if ( $num > 1 ) : ?>
+                <button class="mmission-back-btn" data-stage="<?php echo esc_attr( $num ); ?>" aria-label="前のミッションへ戻る">&#9664; 戻る</button>
+                <?php endif; ?>
                 <?php if ( $num < $total_stages ) : ?>
                 <button class="mmission-next-btn"
                         data-stage="<?php echo esc_attr( $num ); ?>"
@@ -209,9 +208,6 @@ function member_mission_enqueue() {
 
 /* ===== back button ===== */
 .mmission-back-btn {
-    position: absolute;
-    top: 16px;
-    left: 20px;
     background: none;
     border: 1px solid #dde3ee;
     border-radius: 6px;
@@ -221,6 +217,8 @@ function member_mission_enqueue() {
     cursor: pointer;
     transition: background .18s, color .18s;
     line-height: 1.6;
+    margin-right: auto;
+    flex-shrink: 0;
 }
 .mmission-back-btn:hover {
     background: #f0f4fb;
@@ -234,7 +232,6 @@ function member_mission_enqueue() {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 14px;
-    padding-top: 8px;
 }
 .mmission-title {
     margin: 0;
@@ -350,6 +347,7 @@ function member_mission_enqueue() {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    gap: 12px;
 }
 
 /* ===== next button ===== */
@@ -561,17 +559,19 @@ CSS;
         var stageNum = parseInt($cb.data('stage'), 10);
         var isNowOn  = !$cb.hasClass('mmission-cb--checked');
 
+        // DOM更新前に「全完了だったか」を記録
+        var tot        = totalInStage(stageNum);
+        var wasAllDone = (checkedInStage(stageNum) === tot);
+
         $cb.toggleClass('mmission-cb--checked', isNowOn)
            .attr('aria-checked', isNowOn ? 'true' : 'false');
 
         $cb.closest('.mmission-item').toggleClass('mmission-done', isNowOn);
 
-        var wasAllDone = (checkedInStage(stageNum) === totalInStage(stageNum));
-
         refreshFooter(stageNum);
 
-        // trigger confetti if just became all-done
-        var allDone = (checkedInStage(stageNum) === totalInStage(stageNum));
+        // DOM更新後に「全完了になったか」を判定 → 紙吹雪
+        var allDone = (checkedInStage(stageNum) === tot);
         if (allDone && !wasAllDone) {
             setTimeout(celebrate, 120);
         }
