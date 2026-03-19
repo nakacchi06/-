@@ -21,14 +21,14 @@ function member_mission_get_stages() {
             'label'   => '入会直後ミッション①',
             'monthly' => false,
             'items'   => [
-                'intro_post' => '質問掲示板の「自己紹介」に投稿する。',
+                'intro_post' => '質問掲示板の「<a href="https://dekiruba.com/forums/topic/%f0%9f%8c%9f%e6%8c%a8%e6%8b%b6%ef%bc%86%e8%87%aa%e5%b7%b1%e7%b4%b9%e4%bb%8b%e3%83%88%e3%83%94%e3%83%83%e3%82%af%ef%bc%81/" target="_blank" rel="noopener">自己紹介</a>」に投稿する。',
             ],
         ],
         2 => [
             'label'   => '入会直後ミッション②',
             'monthly' => false,
             'items'   => [
-                'diagnosis' => 'オススメ教材診断を使用する。',
+                'diagnosis' => '<a href="https://dekiruba.com/members-only-contents/#osusume" target="_blank" rel="noopener">オススメ教材診断</a>を使用する。',
                 'download'  => '教材を１つダウンロードする。',
             ],
         ],
@@ -36,19 +36,19 @@ function member_mission_get_stages() {
             'label'   => '入会直後ミッション③',
             'monthly' => false,
             'items'   => [
-                'zoom_reserve' => '月１Zoom相談の予約を入れる。',
-                'club_visit'   => 'クラブ活動を覗いてみる。',
-                'weekend_talk' => '週末しゃべるばに参加する。',
+                'zoom_reserve' => '<a href="https://dekiruba.com/members-only-contents/private-consulation/" target="_blank" rel="noopener">月１Zoom相談</a>の予約を入れる。',
+                'club_visit'   => '<a href="https://dekiruba.com/members-only-contents/clubactivitys/" target="_blank" rel="noopener">クラブ活動</a>を覗いてみる。',
+                'weekend_talk' => '<a href="https://dekiruba.com/members-only-contents/weekend-talk/" target="_blank" rel="noopener">週末しゃべるば</a>に参加する。',
             ],
         ],
         4 => [
             'label'   => 'マンスリーミッション',
             'monthly' => true,
             'items'   => [
-                'zoom_monthly'  => '月１Zoom相談の予約を入れる。',
-                'live_check'    => 'LIVE授業の内容をチェックする。',
+                'zoom_monthly'  => '<a href="https://dekiruba.com/members-only-contents/private-consulation/" target="_blank" rel="noopener">月１Zoom相談</a>の予約を入れる。',
+                'live_check'    => '<a href="https://dekiruba.com/members-only-contents/live-class/" target="_blank" rel="noopener">LIVE授業</a>の内容をチェックする。',
                 'material_try'  => '教材を１つ試してみる。',
-                'weekend_talk2' => '週末しゃべるばに１回参加する。',
+                'weekend_talk2' => '<a href="https://dekiruba.com/members-only-contents/weekend-talk/" target="_blank" rel="noopener">週末しゃべるば</a>に１回参加する。',
             ],
         ],
     ];
@@ -146,7 +146,7 @@ function member_mission_shortcode() {
                                 <polyline points="1,5 4.5,9 11,1"/>
                             </svg>
                         </span>
-                        <span class="mmission-text"><?php echo esc_html( $label ); ?></span>
+                        <span class="mmission-text"><?php echo wp_kses( $label, [ 'a' => [ 'href' => [], 'target' => [], 'rel' => [] ] ] ); ?></span>
                     </label>
                 </li>
                 <?php endforeach; ?>
@@ -388,6 +388,19 @@ function member_mission_enqueue() {
     font-size: .9rem;
     font-weight: 600;
     animation: mmission-btn-pop .35s cubic-bezier(.18,1.4,.4,1) both;
+}
+
+/* ===== inline links ===== */
+.mmission-text a {
+    color: #4a90e2;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.mmission-text a:hover {
+    color: #3a7bd0;
+}
+.mmission-done .mmission-text a {
+    color: #b0b8c8;
 }
 
 /* ===== confetti overlay ===== */
