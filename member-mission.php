@@ -86,8 +86,8 @@ function member_mission_shortcode( $atts = [] ) {
 
     $atts = shortcode_atts(
         [
-            'check_sound' => '',
-            'clear_sound' => '',
+            'check_sound' => 'https://dekiruba.com/wp-content/uploads/2026/03/btn.mp3',
+            'clear_sound' => 'https://dekiruba.com/wp-content/uploads/2026/03/kira.mp3',
         ],
         $atts,
         'member_mission'
